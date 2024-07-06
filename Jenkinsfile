@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/muxika21/DevOps_Avenger_CICD.git'
+                git branch: 'develop', url: 'https://github.com/muxika21/DevOps_Avenger_CICD.git'
             }
         }
 
