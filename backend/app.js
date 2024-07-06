@@ -1,0 +1,26 @@
+const express = require('express');
+const app = express();
+const port = 3000;
+const mysql = require('mysql2');
+
+// Set up the database connection
+const connection = mysql.createConnection({
+  host: 'db',
+  user: 'root',
+  password: 'root_password',
+  database: 'mydatabase' // Changed to 'mydatabase'
+});
+
+app.set('view engine', 'ejs');
+
+app.get('/', (req, res) => {
+  connection.query('SELECT * FROM cicd_pipeline', (error, results) => 
+  { 
+    if (error) throw error;
+    res.render('index', { users: results }); // 'users' is the variable passed to the template
+  });
+});
+
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
+});
