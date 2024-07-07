@@ -7,7 +7,7 @@ pipeline {
         SONARQUBE_TOKEN = credentials('sonarqube-token')
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
         TRIVY_VERSION = '0.53.0'
-        DOCKER_REPO = 'syahridan/devops_avengers'
+        DOCKER_REPO = ''devops-avengers_cicd-app'
     }
 
     stages {
