@@ -94,11 +94,11 @@ pipeline {
 
                             # Tag the Docker image with the build number
                             docker tag ${DOCKER_IMAGE_NAME}:latest ${DOCKER_REPO}:latest
-                            docker tag ${DOCKER_IMAGE_NAME}:latest ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
+                            docker tag ${DOCKER_IMAGE_NAME}:latest ${DOCKER_REPO}:build-${BUILD_NUMBER}
 
                             # Push the Docker image to Docker Hub
                             docker push ${DOCKER_REPO}:latest
-                            docker push ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
+                            docker push ${DOCKER_REPO}:build-${BUILD_NUMBER}
                         '''
                     }
                 }
@@ -109,15 +109,15 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        jmeter -n -t /home/syahridan/jmeter/simple_test.jmx -l /home/syahridan/jmeter/results-${env.BUILD_NUMBER}.jtl
+                        jmeter -n -t /home/syahridan/jmeter/simple_test.jmx -l /home/syahridan/jmeter/results-${BUILD_NUMBER}.jtl
                         echo 'JMeter performance test completed'
                     '''
                 }
             }
             post {
                 always {
-                    jmeterResults "/home/syahridan/jmeter/results-${env.BUILD_NUMBER}.jtl"
-                    archiveArtifacts artifacts: "jmeter/results-${env.BUILD_NUMBER}.jtl", allowEmptyArchive: true
+                    jmeterResults "/home/syahridan/jmeter/results-${BUILD_NUMBER}.jtl"
+                    archiveArtifacts artifacts: "jmeter/results-${BUILD_NUMBER}.jtl", allowEmptyArchive: true
                 }
             }
         }
