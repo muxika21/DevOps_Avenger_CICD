@@ -10,9 +10,6 @@ pipeline {
         DOCKER_REPO = 'syahridan/devops-avengers-cicd-app'
         JMETER_HOME = '/opt/apache-jmeter-5.6.3'
         PATH = "${JMETER_HOME}/bin:${env.PATH}"
-        JMETER_TEST_PLAN = 'jmeter/simple_test.jmx'
-        JMETER_RESULTS_DIR = "jmeter/results-${BUILD_NUMBER}.jtl"
-        APP_URL = 'http://localhost'  // Update with your application's URL if different
     }
 
     stages {
@@ -103,29 +100,26 @@ pipeline {
         stage('JMeter Performance Testing') {
             steps {
                 script {
-                    // Ensure PATH includes JMeter bin directory
                     env.PATH = "${JMETER_HOME}/bin:${env.PATH}"
-                    
-                    // Run JMeter test on the deployed application
-                    sh '''
-                        jmeter -n -t ${JMETER_TEST_PLAN} -l ${JMETER_RESULTS_DIR} -Jtarget.url=${APP_URL}
-                        echo 'JMeter performance test completed'
-                    '''
+                    sh 'ls -l ${env.WORKSPACE}/jmeter'
+                    sh "jmeter -n -t ${env.WORKSPACE}/jmeter/simple_test.jmx -l ${env.WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl"
+                    echo 'JMeter performance test completed'
                 }
             }
             post {
                 always {
-                    // Archive JMeter results
-                    archiveArtifacts artifacts: "${JMETER_RESULTS_DIR}", allowEmptyArchive: true
+                    archiveArtifacts artifacts: "jmeter/results-${BUILD_NUMBER}.jtl", allowEmptyArchive: true
                 }
             }
         }
 
-        stage('Post-Test Cleanup') {
+        stage('Notify') {
             steps {
                 script {
-                    dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD') {
-                        sh 'docker-compose down'
+                    if (currentBuild.result == 'SUCCESS') {
+                        echo 'Build and test succeeded!'
+                    } else {
+                        error 'Build or test failed!'
                     }
                 }
             }
@@ -135,9 +129,9 @@ pipeline {
     post {
         always {
             script {
-                // Ensure cleanup is done even if the pipeline fails
+                // Optional cleanup step; comment out if you want to keep containers for inspection
                 dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD') {
-                    sh 'docker-compose down'
+                    // sh 'docker-compose down'
                 }
             }
         }
