@@ -1,14 +1,14 @@
 {
-  "name": "devops-avengers",
+  "name": "devops-avengers-cicd-app",
   "version": "1.0.0",
+  "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "start": "node index.js",  // Ensure the start script is correctly defined
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "mysql2": "^3.9.8"
+    "express": "^4.17.1"
   },
-  "devDependencies": {
-    "mocha": "^10.0.0",
-    "chai": "^4.3.0"
-  }
+  "author": "",
+  "license": "ISC"
 }
