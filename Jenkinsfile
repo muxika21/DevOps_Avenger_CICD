@@ -66,13 +66,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        if ! command -v trivy &> /dev/null
-                        then
-                            wget https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
-                            tar zxvf trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
-                            mv trivy /usr/local/bin/
-                        fi
-
+                       
                         trivy image --no-progress --exit-code 1 --severity HIGH,CRITICAL ${DOCKER_REPO}:latest
                     '''
                 }
