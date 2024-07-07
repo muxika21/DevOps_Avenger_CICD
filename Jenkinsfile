@@ -7,8 +7,9 @@ pipeline {
         SONARQUBE_TOKEN = credentials('sonarqube-token')
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
         TRIVY_VERSION = '0.53.0'
-        DOCKER_IMAGE_NAME = 'devops-avengers_cicd-app'  // Correct Docker image name
-        DOCKER_REPO = 'syahridan/devops-avengers-cicd-app'  // DockerHub repository
+        DOCKER_REPO = 'syahridan/devops-avengers-cicd-app'
+        JMETER_HOME = '/root/apache-jmeter-5.6.3'  // Path to the JMeter installation directory
+        PATH = "${JMETER_HOME}/bin:${env.PATH}"  // Add JMeter bin directory to PATH
     }
 
     stages {
@@ -41,8 +42,6 @@ pipeline {
                                     echo "sonar-scanner not found!"
                                     exit 1
                                 fi
-                            '''
-                            sh '''
                                 sonar-scanner \
                                 -Dsonar.projectKey=DevOps_Avenger_CICD \
                                 -Dsonar.sources=. \
@@ -58,10 +57,7 @@ pipeline {
         stage('Docker Image Build') {
             steps {
                 script {
-                    sh '''
-                        docker-compose build
-                        docker tag ${DOCKER_IMAGE_NAME}:latest ${DOCKER_IMAGE_NAME}:latest
-                    '''
+                    sh 'docker-compose build'
                 }
             }
         }
@@ -70,15 +66,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        if ! command -v trivy &> /dev/null
-                        then
-                            wget https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-x86_64.tar.gz
-                            tar zxvf trivy_${TRIVY_VERSION}_Linux-x86_64.tar.gz
-                            mv trivy /usr/local/bin/
-                        fi
-
-                        # Scan the Docker image
-                        trivy image --no-progress --exit-code 1 --severity HIGH,CRITICAL ${DOCKER_IMAGE_NAME}:latest
+                        trivy image --no-progress --exit-code 1 --severity HIGH,CRITICAL ${DOCKER_REPO}:latest
                     '''
                 }
             }
@@ -89,16 +77,9 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         sh '''
-                            # Log in to Docker Hub
                             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-
-                            # Tag the Docker image with the build number
-                            docker tag ${DOCKER_IMAGE_NAME}:latest ${DOCKER_REPO}:latest
-                            docker tag ${DOCKER_IMAGE_NAME}:latest ${DOCKER_REPO}:build-${BUILD_NUMBER}
-
-                            # Push the Docker image to Docker Hub
-                            docker push ${DOCKER_REPO}:latest
-                            docker push ${DOCKER_REPO}:build-${BUILD_NUMBER}
+                            docker tag ${DOCKER_REPO}:latest ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
+                            docker push ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
                         '''
                     }
                 }
@@ -109,15 +90,15 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        jmeter -n -t /home/syahridan/jmeter/simple_test.jmx -l /home/syahridan/jmeter/results-${BUILD_NUMBER}.jtl
+                        jmeter -n -t /home/syahridan/jmeter/simple_test.jmx -l /home/syahridan/jmeter/results-${env.BUILD_NUMBER}.jtl
                         echo 'JMeter performance test completed'
                     '''
                 }
             }
             post {
                 always {
-                    jmeterResults "/home/syahridan/jmeter/results-${BUILD_NUMBER}.jtl"
-                    archiveArtifacts artifacts: "jmeter/results-${BUILD_NUMBER}.jtl", allowEmptyArchive: true
+                    jmeterResults "/home/syahridan/jmeter/results-${env.BUILD_NUMBER}.jtl"
+                    archiveArtifacts artifacts: "jmeter/results-${env.BUILD_NUMBER}.jtl", allowEmptyArchive: true
                 }
             }
         }
