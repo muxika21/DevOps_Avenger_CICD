@@ -1,9 +1,9 @@
 {
   "name": "devops-avengers-cicd-app",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node app.js",
     "test": "mocha test/app.test.js"
   },
   "dependencies": {
