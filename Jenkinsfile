@@ -7,7 +7,8 @@ pipeline {
         SONARQUBE_TOKEN = credentials('sonarqube-token')
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
         TRIVY_VERSION = '0.53.0'
-        DOCKER_IMAGE_NAME = 'syahridan/devops-avengers-cicd-app'  // Docker image name for the build and push
+        DOCKER_IMAGE_NAME = 'devops-avengers_cicd-app'  // Correct Docker image name
+        DOCKER_REPO = 'syahridan/devops-avengers-cicd-app'  // DockerHub repository
     }
 
     stages {
@@ -57,7 +58,10 @@ pipeline {
         stage('Docker Image Build') {
             steps {
                 script {
-                    sh 'docker-compose build'
+                    sh '''
+                        docker-compose build
+                        docker tag ${DOCKER_IMAGE_NAME}:latest ${DOCKER_IMAGE_NAME}:latest
+                    '''
                 }
             }
         }
@@ -89,10 +93,12 @@ pipeline {
                             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
 
                             # Tag the Docker image with the build number
-                            docker tag ${DOCKER_IMAGE_NAME}:latest ${DOCKER_IMAGE_NAME}:build-${env.BUILD_NUMBER}
+                            docker tag ${DOCKER_IMAGE_NAME}:latest ${DOCKER_REPO}:latest
+                            docker tag ${DOCKER_IMAGE_NAME}:latest ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
 
-                            # Push the tagged Docker image to Docker Hub
-                            docker push ${DOCKER_IMAGE_NAME}:build-${env.BUILD_NUMBER}
+                            # Push the Docker image to Docker Hub
+                            docker push ${DOCKER_REPO}:latest
+                            docker push ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
                         '''
                     }
                 }
