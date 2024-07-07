@@ -101,8 +101,8 @@ pipeline {
             steps {
                 script {
                     env.PATH = "${JMETER_HOME}/bin:${env.PATH}"
-                    sh 'ls -l ${env.WORKSPACE}/jmeter'
-                    sh "jmeter -n -t ${env.WORKSPACE}/jmeter/simple_test.jmx -l ${env.WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl"
+                    sh 'ls -l ${WORKSPACE}/jmeter'
+                    sh "jmeter -n -t ${WORKSPACE}/jmeter/simple_test.jmx -l ${WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl"
                     echo 'JMeter performance test completed'
                 }
             }
