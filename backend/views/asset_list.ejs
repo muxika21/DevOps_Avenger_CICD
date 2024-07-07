@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Asset List</title>
+</head>
+<body>
+  <h1>Asset List</h1>
+  <table border="1">
+    <tr>
+      <th>Staff Name</th>
+      <th>Model</th>
+      <th>Serial Number</th>
+    </tr>
+    <% users.forEach(function(user) { %>
+      <tr>
+        <td><%= user.staff_name %></td>
+        <td><%= user.model %></td>
+        <td><%= user.serial_number %></td>
+      </tr>
+    <% }); %>
+  </table>
+</body>
+</html>

@@ -1,16 +1,28 @@
-html
-Copy code
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Node.js App</title>
+  <title>Asset Management</title>
 </head>
 <body>
-  <h1>User List</h1>
-  <ul>
-    <% users.forEach(user => { %>
-      <li><%= user.name %></li>
-    <% }); %>
-  </ul>
+  <h1>Asset Management</h1>
+
+  <h2>Add New Asset</h2>
+  <form action="/add" method="POST">
+    <label for="staff_name">Staff Name:</label>
+    <input type="text" id="staff_name" name="staff_name" required>
+    <br>
+    <label for="model">Model:</label>
+    <input type="text" id="model" name="model" required>
+    <br>
+    <label for="serial_number">Serial Number:</label>
+    <input type="text" id="serial_number" name="serial_number" required>
+    <br>
+    <button type="submit">Add</button>
+  </form>
+
+  <h2>Search Assets</h2>
+  <form action="/search" method="GET">
+    <button type="submit">Search</button>
+  </form>
 </body>
 </html>
