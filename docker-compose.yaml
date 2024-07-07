@@ -2,27 +2,35 @@ version: '3.8'
 
 services:
   app:
-    build: ./backend
+    image: ${DOCKER_REPO}:build-${BUILD_NUMBER}  # Ensure this points to the correct image
+    container_name: devops-avengers-cicd-app
     ports:
       - "3000:3000"
-    depends_on:
-      - db
     networks:
       - mynetwork
+    depends_on:
+      - db
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./app:/usr/src/app  # Ensure this path is correct
 
   db:
     image: mariadb:10.5
-    environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: mydatabase  # Create the database
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    container_name: devops-avengers-cicd-db
     networks:
       - mynetwork
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/mysql
 
 networks:
   mynetwork:
+    driver: bridge
 
 volumes:
   db_data:
