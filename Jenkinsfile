@@ -112,18 +112,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Notify') {
-            steps {
-                script {
-                    if (currentBuild.result == 'SUCCESS') {
-                        echo 'Build and test succeeded!'
-                    } else {
-                        error 'Build or test failed!'
-                    }
-                }
-            }
-        }
     }
 
     post {
