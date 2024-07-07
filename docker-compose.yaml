@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 services:
   app:
@@ -13,6 +13,10 @@ services:
       - db
     environment:
       - NODE_ENV=production
+      - DB_HOST=db
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=mydatabase
     volumes:
       - ./backend:/usr/src/app  # Ensure this path is correct
 
@@ -23,7 +27,7 @@ services:
       - mynetwork
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: mydb
+      MYSQL_DATABASE: mydatabase
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     volumes:
