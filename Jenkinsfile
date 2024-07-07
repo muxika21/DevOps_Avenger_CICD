@@ -7,7 +7,7 @@ pipeline {
         SONARQUBE_TOKEN = credentials('sonarqube-token')
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
         TRIVY_VERSION = '0.53.0'
-        DOCKER_REPO = 'syahridan/devops-avengers-cicd-app'
+        DOCKER_IMAGE_NAME = 'syahridan/devops-avengers-cicd-app'  // Docker image name for the build and push
     }
 
     stages {
@@ -73,25 +73,26 @@ pipeline {
                             mv trivy /usr/local/bin/
                         fi
 
-                        trivy image --no-progress --exit-code 1 --severity HIGH,CRITICAL ${DOCKER_REPO}:latest
+                        # Scan the Docker image
+                        trivy image --no-progress --exit-code 1 --severity HIGH,CRITICAL ${DOCKER_IMAGE_NAME}:latest
                     '''
                 }
             }
         }
 
         stage('Docker Hub Image Push') {
-    steps {
-        script {
-            withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                sh '''
-                    # Log in to Docker Hub
-                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh '''
+                            # Log in to Docker Hub
+                            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
 
-                    # Tag the Docker image with the build number
-                    docker tag ${DOCKER_REPO}:latest ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
+                            # Tag the Docker image with the build number
+                            docker tag ${DOCKER_IMAGE_NAME}:latest ${DOCKER_IMAGE_NAME}:build-${env.BUILD_NUMBER}
 
-                    # Push the tagged Docker image to Docker Hub
-                    docker push ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
+                            # Push the tagged Docker image to Docker Hub
+                            docker push ${DOCKER_IMAGE_NAME}:build-${env.BUILD_NUMBER}
                         '''
                     }
                 }
