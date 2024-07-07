@@ -85,14 +85,28 @@ pipeline {
             }
         }
 
+        stage('Deploy Application') {
+            steps {
+                script {
+                    // Start the Docker containers using Docker Compose
+                    sh 'docker-compose up -d'
+                    // Optionally, you can add commands to verify the deployment, such as:
+                    // sh 'docker-compose ps'
+                }
+            }
+        }
+
         stage('JMeter Performance Testing') {
             steps {
                 script {
+                    // Ensure PATH includes JMeter bin directory
+                    env.PATH = "/opt/apache-jmeter-5.6.3/bin:${env.PATH}"
+                    
                     // Ensure that the simple_test.jmx file is available in the Jenkins workspace
-                    sh 'ls -l $WORKSPACE/jmeter'
+                    sh 'ls -l ${env.WORKSPACE}/jmeter'
                     
                     // Run JMeter test
-                    sh "jmeter -n -t $WORKSPACE/jmeter/simple_test.jmx -l $WORKSPACE/jmeter/results-${BUILD_NUMBER}.jtl"
+                    sh "jmeter -n -t ${env.WORKSPACE}/jmeter/simple_test.jmx -l ${env.WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl"
                     echo 'JMeter performance test completed'
                 }
             }
@@ -108,7 +122,7 @@ pipeline {
     post {
         always {
             script {
-                // Bring down Docker containers and remove networks
+                // Stop and remove Docker containers
                 sh 'docker-compose down'
             }
         }
