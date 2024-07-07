@@ -88,10 +88,15 @@ pipeline {
         stage('JMeter Performance Testing') {
             steps {
                 script {
-                    sh '''
-                        export PATH=/opt/apache-jmeter-5.6.3/bin:$PATH
-                        jmeter -n -t /home/syahridan/jmeter/simple_test.jmx -l /home/syahridan/jmeter/results-${BUILD_NUMBER}.jtl
-                        echo 'JMeter performance test completed'
+                    // Ensure PATH includes JMeter bin directory
+                    env.PATH = "/opt/apache-jmeter-5.6.3/bin:${env.PATH}"
+                    
+                    // Ensure that the simple_test.jmx file is available in the Jenkins workspace
+                    sh 'ls -l ${env.WORKSPACE}/jmeter'
+                    
+                    // Run JMeter test
+                    sh "jmeter -n -t ${env.WORKSPACE}/jmeter/simple_test.jmx -l ${env.WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl"
+                    echo 'JMeter performance test completed'
                     '''
                 }
             }
@@ -112,3 +117,4 @@ pipeline {
         }
     }
 }
+	
