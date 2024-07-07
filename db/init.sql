@@ -1,5 +1,4 @@
 CREATE DATABASE IF NOT EXISTS mydatabase;
-
 USE mydatabase;
 
 CREATE TABLE IF NOT EXISTS cicd_pipeline (
@@ -9,6 +8,5 @@ CREATE TABLE IF NOT EXISTS cicd_pipeline (
   serial_number VARCHAR(255) NOT NULL
 );
 
-INSERT INTO cicd_pipeline (staff_name, model, serial_number) VALUES
-('John Doe', 'Model X', 'SN123456'),
-('Jane Smith', 'Model Y', 'SN789012');
+INSERT INTO cicd_pipeline (staff_name, model, serial_number) VALUES ('John Doe', 'Dell XPS 13', '12345');
+INSERT INTO cicd_pipeline (staff_name, model, serial_number) VALUES ('Jane Smith', 'MacBook Pro', '67890');
