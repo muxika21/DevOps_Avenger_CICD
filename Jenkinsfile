@@ -8,8 +8,8 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
         TRIVY_VERSION = '0.53.0'
         DOCKER_REPO = 'syahridan/devops-avengers-cicd-app'
-        JMETER_HOME = '/root/apache-jmeter-5.6.3'  // Path to the JMeter installation directory
-        PATH = "${JMETER_HOME}/bin:${env.PATH}"  // Add JMeter bin directory to PATH
+        JMETER_HOME = '/opt/apache-jmeter-5.6.3'  // Corrected path
+        PATH = "${JMETER_HOME}/bin:${env.PATH}"  // Added JMeter bin directory to PATH
     }
 
     stages {
@@ -35,7 +35,6 @@ pipeline {
                 script {
                     dir('backend') {
                         withSonarQubeEnv('SonarQube') {
-                            // Verify sonar-scanner installation
                             sh '''
                                 if ! command -v sonar-scanner &> /dev/null
                                 then
@@ -90,7 +89,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        export PATH=${JMETER_HOME}/bin:$PATH
+                        export PATH=/opt/apache-jmeter-5.6.3/bin:$PATH
                         jmeter -n -t /home/syahridan/jmeter/simple_test.jmx -l /home/syahridan/jmeter/results-${BUILD_NUMBER}.jtl
                         echo 'JMeter performance test completed'
                     '''
@@ -98,7 +97,7 @@ pipeline {
             }
             post {
                 always {
-                    jmeterResults "/home/syahridan/jmeter/results-${BUILD_NUMBER}.jtl"
+                    // Archive JMeter results
                     archiveArtifacts artifacts: "jmeter/results-${BUILD_NUMBER}.jtl", allowEmptyArchive: true
                 }
             }
