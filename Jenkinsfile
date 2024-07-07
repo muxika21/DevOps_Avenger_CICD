@@ -90,6 +90,7 @@ pipeline {
             steps {
                 script {
                     sh '''
+                        export PATH=${JMETER_HOME}/bin:$PATH
                         jmeter -n -t /home/syahridan/jmeter/simple_test.jmx -l /home/syahridan/jmeter/results-${BUILD_NUMBER}.jtl
                         echo 'JMeter performance test completed'
                     '''
