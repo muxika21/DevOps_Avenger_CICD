@@ -66,13 +66,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        if ! command -v trivy &> /dev/null
-                        then
-                            wget https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-x86_64.tar.gz
-                            tar zxvf trivy_${TRIVY_VERSION}_Linux-x86_64.tar.gz
-                            mv trivy /usr/local/bin/
-                        fi
-
+                       
                         trivy image --no-progress --exit-code 1 --severity HIGH,CRITICAL ${DOCKER_REPO}:latest
                     '''
                 }
@@ -84,13 +78,8 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         sh '''
-                            # Log in to Docker Hub
                             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-
-                            # Tag the Docker image with the build number
                             docker tag ${DOCKER_REPO}:latest ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
-
-                            # Push the tagged Docker image to Docker Hub
                             docker push ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
                         '''
                     }
