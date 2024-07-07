@@ -8,11 +8,8 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
         TRIVY_VERSION = '0.53.0'
         DOCKER_REPO = 'syahridan/devops-avengers-cicd-app'
-        JMETER_HOME = '/opt/apache-jmeter-5.6.3'
-        PATH = "${JMETER_HOME}/bin:${env.PATH}"
-        JMETER_TEST_PLAN = 'jmeter/simple_test.jmx'
-        JMETER_RESULTS_DIR = "jmeter/results-${BUILD_NUMBER}.jtl"
-        APP_URL = 'http://localhost'  // Update with your application's URL if different
+        JMETER_HOME = '/opt/apache-jmeter-5.6.3'  // Corrected path
+        PATH = "${JMETER_HOME}/bin:${env.PATH}"  // Added JMeter bin directory to PATH
     }
 
     stages {
@@ -91,11 +88,10 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 script {
-                    dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD') {
-                        sh 'docker-compose up -d'
-                        sh 'docker-compose ps'
-                        sh 'docker-compose logs'
-                    }
+                    // Start the Docker containers using Docker Compose
+                    sh 'docker-compose up -d'
+                    // Optionally, you can add commands to verify the deployment, such as:
+                    // sh 'docker-compose ps'
                 }
             }
         }
@@ -104,29 +100,20 @@ pipeline {
             steps {
                 script {
                     // Ensure PATH includes JMeter bin directory
-                    env.PATH = "${JMETER_HOME}/bin:${env.PATH}"
+                    env.PATH = "/opt/apache-jmeter-5.6.3/bin:${env.PATH}"
                     
-                    // Run JMeter test on the deployed application
-                    sh '''
-                        jmeter -n -t ${JMETER_TEST_PLAN} -l ${JMETER_RESULTS_DIR} -Jtarget.url=${APP_URL}
-                        echo 'JMeter performance test completed'
-                    '''
+                    // Ensure that the simple_test.jmx file is available in the Jenkins workspace
+                    sh 'ls -l ${env.WORKSPACE}/jmeter'
+                    
+                    // Run JMeter test
+                    sh "jmeter -n -t ${env.WORKSPACE}/jmeter/simple_test.jmx -l ${env.WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl"
+                    echo 'JMeter performance test completed'
                 }
             }
             post {
                 always {
                     // Archive JMeter results
-                    archiveArtifacts artifacts: "${JMETER_RESULTS_DIR}", allowEmptyArchive: true
-                }
-            }
-        }
-
-        stage('Post-Test Cleanup') {
-            steps {
-                script {
-                    dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD') {
-                        sh 'docker-compose down'
-                    }
+                    archiveArtifacts artifacts: "jmeter/results-${BUILD_NUMBER}.jtl", allowEmptyArchive: true
                 }
             }
         }
@@ -135,10 +122,8 @@ pipeline {
     post {
         always {
             script {
-                // Ensure cleanup is done even if the pipeline fails
-                dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD') {
-                    sh 'docker-compose down'
-                }
+                // Stop and remove Docker containers
+                sh 'docker-compose down'
             }
         }
     }
