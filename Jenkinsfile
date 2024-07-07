@@ -78,8 +78,8 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         sh '''
                             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                            docker tag ${DOCKER_REPO}:latest ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
-                            docker push ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
+                            docker tag ${DOCKER_REPO}:latest ${DOCKER_REPO}:build-${BUILD_NUMBER}
+                            docker push ${DOCKER_REPO}:build-${BUILD_NUMBER}
                         '''
                     }
                 }
@@ -90,15 +90,15 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        jmeter -n -t /home/syahridan/jmeter/simple_test.jmx -l /home/syahridan/jmeter/results-${env.BUILD_NUMBER}.jtl
+                        jmeter -n -t /home/syahridan/jmeter/simple_test.jmx -l /home/syahridan/jmeter/results-${BUILD_NUMBER}.jtl
                         echo 'JMeter performance test completed'
                     '''
                 }
             }
             post {
                 always {
-                    jmeterResults "/home/syahridan/jmeter/results-${env.BUILD_NUMBER}.jtl"
-                    archiveArtifacts artifacts: "jmeter/results-${env.BUILD_NUMBER}.jtl", allowEmptyArchive: true
+                    jmeterResults "/home/syahridan/jmeter/results-${BUILD_NUMBER}.jtl"
+                    archiveArtifacts artifacts: "jmeter/results-${BUILD_NUMBER}.jtl", allowEmptyArchive: true
                 }
             }
         }
