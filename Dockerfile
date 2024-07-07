@@ -1,5 +1,3 @@
-# Dockerfile
-
 # Use the official Node.js image from the Docker Hub
 FROM node:14
 
@@ -19,4 +17,4 @@ COPY backend/ .
 EXPOSE 3000
 
 # Command to run the application
-CMD ["npm", "start"]
+CMD ["node", "app.js"]
