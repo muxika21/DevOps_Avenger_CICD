@@ -80,18 +80,18 @@ pipeline {
         }
 
         stage('Docker Hub Image Push') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh '''
-                            # Log in to Docker Hub
-                            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+    steps {
+        script {
+            withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                sh '''
+                    # Log in to Docker Hub
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
 
-                            # Tag the Docker image with the build number
-                            docker tag ${DOCKER_REPO}:latest ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
+                    # Tag the Docker image with the build number
+                    docker tag ${DOCKER_REPO}:latest ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
 
-                            # Push the tagged Docker image to Docker Hub
-                            docker push ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
+                    # Push the tagged Docker image to Docker Hub
+                    docker push ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
                         '''
                     }
                 }
