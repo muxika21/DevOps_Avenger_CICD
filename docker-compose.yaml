@@ -11,6 +11,10 @@ services:
       - mynetwork
     depends_on:
       - db
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=root_password  # Ensure this matches the MYSQL_ROOT_PASSWORD
+      - DB_NAME=mydatabase
     environment:
       - NODE_ENV=production
     volumes:
