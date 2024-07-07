@@ -3,9 +3,7 @@ version: '3.8'
 services:
   app:
     build:
-      context: .  # Ensure this is the root of your project
-      dockerfile: Dockerfile  # Ensure this is the correct Dockerfile
-    image: ${DOCKER_REPO}:build-${BUILD_NUMBER}
+      context: .  # Ensure this points to the correct context directory
     container_name: devops-avengers-cicd-app
     ports:
       - "3000:3000"
@@ -17,8 +15,6 @@ services:
       - NODE_ENV=production
     volumes:
       - ./backend:/usr/src/app  # Ensure this path is correct
-    command: npm start  # Ensure this is the correct start command
-    restart: unless-stopped
 
   db:
     image: mariadb:10.5
@@ -33,7 +29,6 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    restart: unless-stopped
 
 networks:
   mynetwork:
