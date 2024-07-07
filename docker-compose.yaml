@@ -11,14 +11,15 @@ services:
       - mynetwork
     depends_on:
       - db
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=root_password  # Ensure this matches the MYSQL_ROOT_PASSWORD
-      - DB_NAME=mydatabase
     environment:
       - NODE_ENV=production
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=rootpassword  # Ensure this matches the MYSQL_ROOT_PASSWORD
+      - DB_NAME=mydb  # Ensure this matches MYSQL_DATABASE
     volumes:
       - ./backend:/usr/src/app  # Ensure this path is correct
+    command: npm start  # Ensure this is the correct start command
 
   db:
     image: mariadb:10.5
