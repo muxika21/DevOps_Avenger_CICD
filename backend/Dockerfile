@@ -1,18 +1,20 @@
-# Use an official Node.js runtime as a parent image
-FROM node:18-alpine
+# Use the official Node.js image from the Docker Hub
+FROM node:14
 
-# Set the working directory
+# Set the working directory in the container
 WORKDIR /usr/src/app
 
+# Copy package.json and package-lock.json
+COPY backend/package*.json ./
+
 # Install dependencies
-COPY package*.json ./
-RUN npm install --legacy-peer-deps
+RUN npm install
 
-# Copy the application source code to the container
-COPY . .
+# Copy the rest of the application code
+COPY backend/ .
 
-# Run the application
-CMD ["npm", "start"]
-
-# Expose the port that the application runs on
+# Expose port 3000 for the application
 EXPOSE 3000
+
+# Command to run the application
+CMD ["npm", "start"]
