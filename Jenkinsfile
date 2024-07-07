@@ -33,7 +33,14 @@ pipeline {
                 script {
                     dir('backend') {
                         withSonarQubeEnv('SonarQube') {
-                            sh 'npm install -g sonar-scanner'
+                            // Verify sonar-scanner installation
+                            sh '''
+                                if ! command -v sonar-scanner &> /dev/null
+                                then
+                                    echo "sonar-scanner not found!"
+                                    exit 1
+                                fi
+                            '''
                             sh '''
                                 sonar-scanner \
                                 -Dsonar.projectKey=DevOps_Avenger_CICD \
@@ -61,8 +68,8 @@ pipeline {
                     sh '''
                         if ! command -v trivy &> /dev/null
                         then
-                            wget https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-x86_64.tar.gz
-                            tar zxvf trivy_${TRIVY_VERSION}_Linux-x86_64.tar.gz
+                            wget https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+                            tar zxvf trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
                             mv trivy /usr/local/bin/
                         fi
 
