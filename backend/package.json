@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "express": "^4.17.1",
-    "mysql2": "^2.3.3"  // Added mysql2 dependency
+    "mysql2": "^2.3.3"
   },
   "devDependencies": {
     "chai": "^4.3.7",
