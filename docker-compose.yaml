@@ -2,31 +2,42 @@ version: '3.8'
 
 services:
   app:
-    build: ./backend
-    command: npm start  # Ensure this is the correct start command
+    build:
+      context: .  # Ensure this is the root of your project
+      dockerfile: Dockerfile  # Ensure this is the correct Dockerfile
+    image: ${DOCKER_REPO}:build-${BUILD_NUMBER}
+    container_name: devops-avengers-cicd-app
     ports:
       - "3000:3000"
-    depends_on:
-      - db
     networks:
       - mynetwork
+    depends_on:
+      - db
     environment:
-      - NODE_ENV=production  # Set NODE_ENV to production
-    restart: unless-stopped  # Restart policy
+      - NODE_ENV=production
+    volumes:
+      - ./backend:/usr/src/app  # Ensure this path is correct
+    command: npm start  # Ensure this is the correct start command
+    restart: unless-stopped
 
   db:
     image: mariadb:10.5
+    container_name: devops-avengers-cicd-db
+    networks:
+      - mynetwork
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: mydatabase  # Create the database
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
     volumes:
       - db_data:/var/lib/mysql
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - mynetwork
+    restart: unless-stopped
 
 networks:
   mynetwork:
+    driver: bridge
 
 volumes:
   db_data:
