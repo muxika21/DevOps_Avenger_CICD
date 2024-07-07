@@ -6,6 +6,10 @@
 <body>
   <h1>Asset Management</h1>
 
+  <% if (updated) { %>
+    <p style="color: green;">Updated!</p>
+  <% } %>
+
   <h2>Add New Asset</h2>
   <form action="/add" method="POST">
     <label for="staff_name">Staff Name:</label>

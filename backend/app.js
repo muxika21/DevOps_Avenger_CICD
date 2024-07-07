@@ -17,7 +17,8 @@ const connection = mysql.createConnection({
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-  res.render('index');
+  const { updated } = req.query;
+  res.render('index', { updated });
 });
 
 app.post('/add', (req, res) => {
@@ -27,7 +28,7 @@ app.post('/add', (req, res) => {
     [staff_name, model, serial_number],
     (error, results) => {
       if (error) throw error;
-      res.redirect('/');
+      res.redirect('/?updated=true');
     }
   );
 });
