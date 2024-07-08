@@ -7,7 +7,9 @@ pipeline {
         SONARQUBE_TOKEN = credentials('sonarqube-token')
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
         TRIVY_VERSION = '0.53.0'
-        DOCKER_REPO = 'devops-avengers_cicd-app'
+        DOCKER_REPO = 'syahridan/devops-avengers-cicd-app'
+        JMETER_HOME = '/opt/apache-jmeter-5.6.3'
+        PATH = "${JMETER_HOME}/bin:${env.PATH}"
     }
 
     stages {
@@ -33,18 +35,16 @@ pipeline {
                 script {
                     dir('backend') {
                         withSonarQubeEnv('SonarQube') {
-                            // Verify sonar-scanner installation
                             sh '''
                                 if ! command -v sonar-scanner &> /dev/null
                                 then
                                     echo "sonar-scanner not found!"
                                     exit 1
                                 fi
-                            '''
-                            sh '''
                                 sonar-scanner \
                                 -Dsonar.projectKey=DevOps_Avenger_CICD \
                                 -Dsonar.sources=. \
+								-Dsonar.exclusions=node_modules/** \
                                 -Dsonar.host.url=${SONARQUBE_URL} \
                                 -Dsonar.login=${SONARQUBE_TOKEN}
                             '''
@@ -66,7 +66,6 @@ pipeline {
             steps {
                 script {
                     sh '''
-                       
                         trivy image --no-progress --exit-code 1 --severity HIGH,CRITICAL ${DOCKER_REPO}:latest
                     '''
                 }
@@ -79,9 +78,21 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         sh '''
                             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                            docker tag ${DOCKER_REPO}:latest ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
-                            docker push ${DOCKER_REPO}:build-${env.BUILD_NUMBER}
+                            docker tag ${DOCKER_REPO}:latest ${DOCKER_REPO}:build-${BUILD_NUMBER}
+                            docker push ${DOCKER_REPO}:build-${BUILD_NUMBER}
                         '''
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Application') {
+            steps {
+                script {
+                    dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD') {
+                        sh 'docker-compose up -d'
+                        sh 'docker-compose ps'
+                        sh 'docker-compose logs'
                     }
                 }
             }
@@ -90,16 +101,15 @@ pipeline {
         stage('JMeter Performance Testing') {
             steps {
                 script {
-                    sh '''
-                        jmeter -n -t /home/syahridan/jmeter/simple_test.jmx -l /home/syahridan/jmeter/results-${env.BUILD_NUMBER}.jtl
-                        echo 'JMeter performance test completed'
-                    '''
+                    env.PATH = "${JMETER_HOME}/bin:${env.PATH}"
+                    sh 'ls -l ${WORKSPACE}/jmeter'
+                    sh "jmeter -n -t ${WORKSPACE}/jmeter/simple_test.jmx -l ${WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl"
+                    echo 'JMeter performance test completed'
                 }
             }
             post {
                 always {
-                    jmeterResults "/home/syahridan/jmeter/results-${env.BUILD_NUMBER}.jtl"
-                    archiveArtifacts artifacts: "jmeter/results-${env.BUILD_NUMBER}.jtl", allowEmptyArchive: true
+                    archiveArtifacts artifacts: "jmeter/results-${BUILD_NUMBER}.jtl", allowEmptyArchive: true
                 }
             }
         }
@@ -108,7 +118,10 @@ pipeline {
     post {
         always {
             script {
-                sh 'docker-compose down'
+                // Optional cleanup step; comment out if you want to keep containers for inspection
+                dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD') {
+                    // sh 'docker-compose down'
+                }
             }
         }
     }

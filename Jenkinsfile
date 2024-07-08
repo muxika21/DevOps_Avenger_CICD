@@ -44,7 +44,7 @@ pipeline {
                                 sonar-scanner \
                                 -Dsonar.projectKey=DevOps_Avenger_CICD \
                                 -Dsonar.sources=. \
-								-Dsonar.exclusions=node_modules/** \
+                                -Dsonar.exclusions=node_modules/** \
                                 -Dsonar.host.url=${SONARQUBE_URL} \
                                 -Dsonar.login=${SONARQUBE_TOKEN}
                             '''
@@ -103,13 +103,21 @@ pipeline {
                 script {
                     env.PATH = "${JMETER_HOME}/bin:${env.PATH}"
                     sh 'ls -l ${WORKSPACE}/jmeter'
-                    sh "jmeter -n -t ${WORKSPACE}/jmeter/simple_test.jmx -l ${WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl"
+                    sh "jmeter -n -t ${WORKSPACE}/jmeter/simple_test.jmx -l ${WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl -e -o ${WORKSPACE}/jmeter/report-${BUILD_NUMBER}"
                     echo 'JMeter performance test completed'
                 }
             }
             post {
                 always {
                     archiveArtifacts artifacts: "jmeter/results-${BUILD_NUMBER}.jtl", allowEmptyArchive: true
+                    publishHTML(target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: "jmeter/report-${BUILD_NUMBER}",
+                        reportFiles: 'index.html',
+                        reportName: "JMeter Report - Build ${BUILD_NUMBER}"
+                    ])
                 }
             }
         }
