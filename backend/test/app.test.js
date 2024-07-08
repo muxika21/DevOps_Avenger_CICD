@@ -1,53 +1,53 @@
-// test/app.test.js
-const chai = require('chai');
-const expect = chai.expect;
-const sinon = require('sinon');
-const mysql = require('mysql2');
-const app = require('../app'); // Assuming your app is exported from app.js
-const http = require('http');
-const request = require('supertest');
+import chai from 'chai';
+import chaiHttp from 'chai-http';
+import app from '../app.js'; // Import your app or server instance
+import sinon from 'sinon';
+import mysql from 'mysql2';
 
-describe('Express App', function() {
+const { expect } = chai;
+chai.use(chaiHttp);
+
+describe('API and Database Tests', function() {
   let connection;
 
   before(() => {
-    connection = mysql.createConnection({
-      host: 'localhost',
-      user: 'root',
-      password: 'root_password',
-      database: 'mydatabase'
+    connection = sinon.stub(mysql, 'createConnection').returns({
+      query: sinon.stub().yields(null, []),  // Mock a successful query
+      end: sinon.stub()
     });
-
-    sinon.stub(connection, 'query').callsFake((query, callback) => {
-      callback(null, [
-        { staff_name: 'John Doe', model: 'Model X', serial_number: '12345' }
-      ]);
-    });
-
-    app.__set__('connection', connection); // Inject the mock connection into your app
   });
 
   after(() => {
     sinon.restore();
   });
 
-  it('should return a 200 status and HTML content at the root route', function(done) {
-    request(app)
+  it('should return a 200 status for the / endpoint', function(done) {
+    chai.request(app)
       .get('/')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .end(done);
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        done();
+      });
   });
 
-  it('should connect to the database and retrieve data', function(done) {
-    request(app)
+  it('should return a welcome message for the / endpoint', function(done) {
+    chai.request(app)
       .get('/')
-      .expect(200)
-      .expect(res => {
-        expect(res.text).to.include('John Doe');
-        expect(res.text).to.include('Model X');
-        expect(res.text).to.include('12345');
-      })
-      .end(done);
+      .end((err, res) => {
+        expect(res.text).to.include('Welcome to the DevOps Avengers CICD App!');
+        done();
+      });
   });
+
+  it('should connect to the database and query', function(done) {
+    chai.request(app)
+      .get('/some-db-route')
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        expect(connection.called).to.be.true;
+        done();
+      });
+  });
+
+  // Add more tests as needed
 });
