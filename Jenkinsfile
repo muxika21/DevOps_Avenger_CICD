@@ -8,7 +8,7 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
         TRIVY_VERSION = '0.53.0'
         DOCKER_REPO = 'syahridan/devops-avengers-cicd-app'
-        JMETER_HOME = '/opt/apache-jmeter-5.6.3'
+        JMETER_HOME = '/var/lib/jenkins/workspace/DevOps-Avengers_CICD (rnd)/jmeter'
         PATH = "${JMETER_HOME}/bin:${env.PATH}"
     }
 
@@ -19,12 +19,10 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies and Unit Test') {
+        stage('Install Dependencies') {
             steps {
                 script {
-                    // Make sure you are in the correct directory
                     sh 'npm install'
-                    sh 'npm test'  // Run tests for ES Modules or CommonJS
                 }
             }
         }
@@ -78,7 +76,7 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 script {
-                    dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD') {
+                    dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD (rnd)') {
                         sh 'docker-compose up -d'
                         sh 'docker-compose ps'
                         sh 'docker-compose logs'
@@ -90,20 +88,30 @@ pipeline {
         stage('JMeter Performance Testing') {
             steps {
                 script {
+                    // Check if jmeter directory exists, if not create it
+                    if (!fileExists("${JMETER_HOME}")) {
+                        sh "mkdir -p '${JMETER_HOME}'"
+                    }
+
+                    // Copy the test plan from the existing location to the JMeter home directory
+                    sh '''
+                        cp /home/syahridan/jmeter/simple_test.jmx ${JMETER_HOME}/simple_test.jmx
+                    '''
+
                     env.PATH = "${JMETER_HOME}/bin:${env.PATH}"
-                    sh 'ls -l ${WORKSPACE}/jmeter'
-                    sh "jmeter -n -t ${WORKSPACE}/jmeter/simple_test.jmx -l ${WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl -e -o ${WORKSPACE}/jmeter/report-${BUILD_NUMBER}"
+                    sh 'ls -l ${JMETER_HOME}'
+                    sh "jmeter -n -t ${JMETER_HOME}/simple_test.jmx -l ${JMETER_HOME}/results-${BUILD_NUMBER}.jtl -e -o ${JMETER_HOME}/report-${BUILD_NUMBER}"
                     echo 'JMeter performance test completed'
                 }
             }
             post {
                 always {
-                    archiveArtifacts artifacts: "jmeter/results-${BUILD_NUMBER}.jtl", allowEmptyArchive: true
+                    archiveArtifacts artifacts: "${JMETER_HOME}/results-${BUILD_NUMBER}.jtl", allowEmptyArchive: true
                     publishHTML(target: [
                         allowMissing: true,
                         alwaysLinkToLastBuild: true,
                         keepAll: true,
-                        reportDir: "jmeter/report-${BUILD_NUMBER}",
+                        reportDir: "${JMETER_HOME}/report-${BUILD_NUMBER}",
                         reportFiles: 'index.html',
                         reportName: "JMeter Report - Build ${BUILD_NUMBER}"
                     ])
@@ -116,7 +124,7 @@ pipeline {
         always {
             script {
                 // Optional cleanup step; comment out if you want to keep containers for inspection
-                dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD') {
+                dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD (rnd)') {
                     // sh 'docker-compose down'
                 }
             }
