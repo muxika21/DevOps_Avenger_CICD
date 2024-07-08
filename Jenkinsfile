@@ -95,12 +95,12 @@ pipeline {
 
                     // Copy the test plan from the existing location to the JMeter home directory
                     sh '''
-                        cp /home/syahridan/jmeter/simple_test.jmx ${JMETER_HOME}/simple_test.jmx
+                        cp /home/syahridan/jmeter/simple_test.jmx "${JMETER_HOME}/simple_test.jmx"
                     '''
 
                     env.PATH = "${JMETER_HOME}/bin:${env.PATH}"
-                    sh 'ls -l ${JMETER_HOME}'
-                    sh "jmeter -n -t ${JMETER_HOME}/simple_test.jmx -l ${JMETER_HOME}/results-${BUILD_NUMBER}.jtl -e -o ${JMETER_HOME}/report-${BUILD_NUMBER}"
+                    sh 'ls -l "${JMETER_HOME}"'
+                    sh "jmeter -n -t \"${JMETER_HOME}/simple_test.jmx\" -l \"${JMETER_HOME}/results-${BUILD_NUMBER}.jtl\" -e -o \"${JMETER_HOME}/report-${BUILD_NUMBER}\""
                     echo 'JMeter performance test completed'
                 }
             }
