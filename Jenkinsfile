@@ -88,19 +88,32 @@ pipeline {
         stage('JMeter Performance Testing') {
             steps {
                 script {
-                    sh 'ls -l ${JMETER_HOME}/bin'  // List the contents of the JMeter bin directory to verify the presence of 'jmeter'
+                    // Set up JMeter environment
+                    env.PATH = "${JMETER_HOME}/bin:${env.PATH}"
+
+                    // Ensure the jmeter directory exists and is writable
+                    sh 'mkdir -p ${WORKSPACE}/jmeter'
+                    sh 'chmod -R 777 ${WORKSPACE}/jmeter'
+
+                    // List the contents of the JMeter bin directory to verify 'jmeter' is available
+                    sh 'ls -l ${JMETER_HOME}/bin'
+
+                    // Run JMeter performance tests
                     sh "jmeter -n -t ${WORKSPACE}/jmeter/simple_test.jmx -l ${WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl -e -o ${WORKSPACE}/jmeter/report-${BUILD_NUMBER}"
                     echo 'JMeter performance test completed'
                 }
             }
             post {
                 always {
-                    archiveArtifacts artifacts: "${JMETER_HOME}/results-${BUILD_NUMBER}.jtl", allowEmptyArchive: true
+                    // Archive the JMeter results file
+                    archiveArtifacts artifacts: "${WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl", allowEmptyArchive: true
+                    
+                    // Publish the JMeter HTML report
                     publishHTML(target: [
                         allowMissing: true,
                         alwaysLinkToLastBuild: true,
                         keepAll: true,
-                        reportDir: "${JMETER_HOME}/report-${BUILD_NUMBER}",
+                        reportDir: "${WORKSPACE}/jmeter/report-${BUILD_NUMBER}",
                         reportFiles: 'index.html',
                         reportName: "JMeter Report - Build ${BUILD_NUMBER}"
                     ])
