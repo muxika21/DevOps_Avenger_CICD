@@ -93,7 +93,6 @@ pipeline {
 
                     // Ensure the jmeter directory exists and is writable
                     sh 'mkdir -p ${WORKSPACE}/jmeter'
-                    sh 'chmod -R 777 ${WORKSPACE}/jmeter'
 
                     // List the contents of the JMeter bin directory to verify 'jmeter' is available
                     sh 'ls -l ${JMETER_HOME}/bin'
