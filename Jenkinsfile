@@ -116,4 +116,10 @@ pipeline {
         always {
             script {
                 // Optional cleanup step; comment out if you want to keep containers for inspection
-                dir('/var/lib/
+                dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD') {
+                    // sh 'docker-compose down'
+                }
+            }
+        }
+    }
+}
