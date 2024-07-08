@@ -21,5 +21,5 @@
   },
   "author": "",
   "license": "ISC",
-  "type": "module"  // Enable ES Module support if you choose to use ES Modules
+  "type": "module"  // Ensure this comment is removed as JSON does not support comments
 }
