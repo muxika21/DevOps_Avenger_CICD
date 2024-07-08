@@ -1,27 +1,33 @@
 {
-   "name": "Shopping-Cart-Application",
+   "name": "devops-avengers-cicd-app",
    "version": "1.0.0",
-   "description": "",
-   "main": "index.js",
+   "main": "app.js",
    "scripts": {
-      "test": "mocha test/app.test.js",
-      "start": "nodemon src/index.js"
+     "start": "node app.js",
+     "test": "nyc mocha test/app.test.js",
+     "coverage": "nyc report --reporter=lcov"
    },
-   "keywords": [],
-   "author": "",
-   "license": "ISC",
    "dependencies": {
-      "cors": "^2.8.5",
-      "ejs": "^3.1.5",
-      "express": "^4.17.1",
-      "mysql2": "^3.10.2"
-   },
-   "engines": {
-      "node": "v14.15.3"
+     "express": "^4.17.1",
+     "ejs": "^3.1.9",
+     "mysql2": "^2.3.3"
    },
    "devDependencies": {
-      "chai": "^5.1.1",
-      "mocha": "^10.6.0",
-      "supertest": "^6.3.4"
-   }
-}
+     "chai": "^4.3.7",
+     "chai-http": "^4.3.0",
+     "mocha": "^10.2.0",
+     "nyc": "^15.1.0"
+   },
+   "nyc": {
+     "reporter": ["text", "lcov"],
+     "report-dir": "./coverage",
+     "extension": [".js"]
+   },
+   "engines": {
+     "node": "v20.x"
+   },
+   "author": "",
+   "license": "ISC",
+   "type": "module"  // Enable ES Module support if you choose to use ES Modules
+ }
+ 
