@@ -34,9 +34,9 @@ pipeline {
                         sonar-scanner \
                         -Dsonar.projectKey=syahridan-cicd-project \
                         -Dsonar.sources=. \
+                        -Dsonar.exclusions=node_modules/** \
                         -Dsonar.host.url=$SONARQUBE_URL \
                         -Dsonar.login=$SONARQUBE_TOKEN
-                        -Dsonar.exclusions=**/node_modules/**
                     '''
                 }
             }
