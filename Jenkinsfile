@@ -93,6 +93,7 @@ pipeline {
 
                     // Ensure the jmeter directory exists and is writable
                     sh 'mkdir -p ${WORKSPACE}/jmeter'
+                    sh 'chmod -R 777 ${WORKSPACE}/jmeter'
 
                     // List the contents of the JMeter bin directory to verify 'jmeter' is available
                     sh 'ls -l ${JMETER_HOME}/bin'
@@ -105,14 +106,14 @@ pipeline {
             post {
                 always {
                     // Archive the JMeter results file
-                    archiveArtifacts artifacts: "${WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl", allowEmptyArchive: true
+                    archiveArtifacts artifacts: "jmeter/results-${BUILD_NUMBER}.jtl", allowEmptyArchive: true
                     
                     // Publish the JMeter HTML report
                     publishHTML(target: [
                         allowMissing: true,
                         alwaysLinkToLastBuild: true,
                         keepAll: true,
-                        reportDir: "${WORKSPACE}/jmeter/report-${BUILD_NUMBER}",
+                        reportDir: "jmeter/report-${BUILD_NUMBER}",
                         reportFiles: 'index.html',
                         reportName: "JMeter Report - Build ${BUILD_NUMBER}"
                     ])
