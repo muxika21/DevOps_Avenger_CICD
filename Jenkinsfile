@@ -36,6 +36,7 @@ pipeline {
                         -Dsonar.sources=. \
                         -Dsonar.host.url=$SONARQUBE_URL \
                         -Dsonar.login=$SONARQUBE_TOKEN
+                        -Dsonar.exclusions=**/node_modules/**
                     '''
                 }
             }
