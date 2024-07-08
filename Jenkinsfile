@@ -44,6 +44,7 @@ pipeline {
                                 sonar-scanner \
                                 -Dsonar.projectKey=DevOps_Avenger_CICD \
                                 -Dsonar.sources=. \
+								-Dsonar.exclusions=node_modules/** \
                                 -Dsonar.host.url=${SONARQUBE_URL} \
                                 -Dsonar.login=${SONARQUBE_TOKEN}
                             '''
