@@ -30,16 +30,15 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-    steps {
-        withSonarQubeEnv('SonarQube') {
-            sh '''
-                sonar-scanner \
-                -Dsonar.projectKey=syahridan-cicd-project \
-                -Dsonar.sources=. \
-                -Dsonar.host.url=$SONARQUBE_URL \
-                -Dsonar.login=$SONARQUBE_TOKEN
-                        '''
-                    }
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        sonar-scanner \
+                        -Dsonar.projectKey=syahridan-cicd-project \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=$SONARQUBE_URL \
+                        -Dsonar.login=$SONARQUBE_TOKEN
+                    '''
                 }
             }
         }
@@ -117,10 +116,4 @@ pipeline {
         always {
             script {
                 // Optional cleanup step; comment out if you want to keep containers for inspection
-                dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD') {
-                    // sh 'docker-compose down'
-                }
-            }
-        }
-    }
-}
+                dir('/var/lib/
