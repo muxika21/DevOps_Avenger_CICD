@@ -4,7 +4,7 @@
    "description": "",
    "main": "index.js",
    "scripts": {
-     "test": "mocha test/app.test.js",
+     "test": "mocha test/app.test.mjs",
      "start": "nodemon src/index.js"
    },
    "keywords": [],
@@ -21,7 +21,9 @@
    },
    "devDependencies": {
      "chai": "^5.1.1",
-     "mocha": "^10.6.0"
-   }
+     "mocha": "^10.6.0",
+     "supertest": "^6.3.3"
+   },
+   "type": "module"
  }
  

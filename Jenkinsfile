@@ -22,7 +22,6 @@ pipeline {
         stage('Install Dependencies and Unit Test') {
             steps {
                 script {
-                    dir('backend') {
                         sh 'npm install'
                         sh 'npm test'
                     }
