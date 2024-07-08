@@ -88,14 +88,9 @@ pipeline {
         stage('JMeter Performance Testing') {
             steps {
                 script {
-                    // Check if jmeter directory exists, if not create it
-                    if (!fileExists("${JMETER_HOME}")) {
-                        sh "mkdir -p '${JMETER_HOME}'"
-                    }
-
                     env.PATH = "${JMETER_HOME}/bin:${env.PATH}"
-                    sh 'ls -l "${JMETER_HOME}"'
-                    sh "jmeter -n -t \"${JMETER_HOME}/simple_test.jmx\" -l \"${JMETER_HOME}/results-${BUILD_NUMBER}.jtl\" -e -o \"${JMETER_HOME}/report-${BUILD_NUMBER}\""
+                    sh 'ls -l ${WORKSPACE}/jmeter'
+                    sh "jmeter -n -t ${WORKSPACE}/jmeter/simple_test.jmx -l ${WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl -e -o ${WORKSPACE}/jmeter/report-${BUILD_NUMBER}"
                     echo 'JMeter performance test completed'
                 }
             }
