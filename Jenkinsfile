@@ -8,8 +8,8 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
         TRIVY_VERSION = '0.53.0'
         DOCKER_REPO = 'syahridan/devops-avengers-cicd-app'
-        JMETER_HOME = '/var/lib/jenkins/workspace/DevOps-Avengers_CICD_RND/jmeter'
-        PATH = "${JMETER_HOME}/bin:${env.PATH}"
+        JMETER_HOME = '/opt/apache-jmeter-5.6.3'  // Update JMETER_HOME to the correct JMeter installation directory
+        PATH = "${JMETER_HOME}/bin:${env.PATH}"  // Add JMeter bin directory to PATH
     }
 
     stages {
@@ -88,8 +88,7 @@ pipeline {
         stage('JMeter Performance Testing') {
             steps {
                 script {
-                    env.PATH = "${JMETER_HOME}/bin:${env.PATH}"
-                    sh 'ls -l ${WORKSPACE}/jmeter'
+                    sh 'ls -l ${JMETER_HOME}/bin'  // List the contents of the JMeter bin directory to verify the presence of 'jmeter'
                     sh "jmeter -n -t ${WORKSPACE}/jmeter/simple_test.jmx -l ${WORKSPACE}/jmeter/results-${BUILD_NUMBER}.jtl -e -o ${WORKSPACE}/jmeter/report-${BUILD_NUMBER}"
                     echo 'JMeter performance test completed'
                 }
@@ -114,7 +113,7 @@ pipeline {
         always {
             script {
                 // Optional cleanup step; comment out if you want to keep containers for inspection
-                dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD (rnd)') {
+                dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD_RND') {
                     // sh 'docker-compose down'
                 }
             }
