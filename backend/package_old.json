@@ -1,19 +1,21 @@
 {
   "name": "devops-avengers-cicd-app",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "mocha test/app.test.js"
+    "start": "node app.js",
+    "test": "nyc mocha test/app.test.js",
+    "coverage": "nyc report --reporter=lcov"
   },
   "dependencies": {
     "express": "^4.17.1",
-	"ejs": "^3.1.9",
+    "ejs": "^3.1.9",
     "mysql2": "^2.3.3"
   },
   "devDependencies": {
     "chai": "^4.3.7",
-    "mocha": "^10.2.0"
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0"
   },
   "author": "",
   "license": "ISC"

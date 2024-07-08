@@ -34,6 +34,7 @@ pipeline {
             steps {
                 script {
                     dir('backend') {
+                        sh 'ls -l coverage'  // Debugging step to verify coverage report presence
                         withSonarQubeEnv('SonarQube') {
                             sh '''
                                 if ! command -v sonar-scanner &> /dev/null
@@ -45,6 +46,7 @@ pipeline {
                                 -Dsonar.projectKey=DevOps_Avenger_CICD \
                                 -Dsonar.sources=. \
                                 -Dsonar.exclusions=node_modules/** \
+                                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
                                 -Dsonar.host.url=${SONARQUBE_URL} \
                                 -Dsonar.login=${SONARQUBE_TOKEN}
                             '''

@@ -4,16 +4,24 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "mocha test/app.test.js"
+    "test": "nyc mocha test/app.test.js",
+    "coverage": "nyc report --reporter=lcov"
   },
   "dependencies": {
     "express": "^4.17.1",
-	"ejs": "^3.1.9",
+    "ejs": "^3.1.9",
     "mysql2": "^2.3.3"
   },
   "devDependencies": {
     "chai": "^4.3.7",
-    "mocha": "^10.2.0"
+    "chai-http": "^4.3.0",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0"
+  },
+  "nyc": {
+    "reporter": ["text", "lcov"],
+    "report-dir": "./coverage",
+    "extension": [".js"]
   },
   "author": "",
   "license": "ISC"
