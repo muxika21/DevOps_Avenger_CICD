@@ -22,9 +22,9 @@ pipeline {
         stage('Install Dependencies and Unit Test') {
             steps {
                 script {
-                        sh 'npm install'
-                        sh 'npm test'
-                    }
+                    // Make sure you are in the correct directory
+                    sh 'npm install'
+                    sh 'npm test'  // Run tests for ES Modules or CommonJS
                 }
             }
         }
@@ -32,24 +32,22 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    dir('backend') {
-                        sh 'ls -l coverage'  // Debugging step to verify coverage report presence
-                        withSonarQubeEnv('SonarQube') {
-                            sh '''
-                                if ! command -v sonar-scanner &> /dev/null
-                                then
-                                    echo "sonar-scanner not found!"
-                                    exit 1
-                                fi
-                                sonar-scanner \
-                                -Dsonar.projectKey=DevOps_Avenger_CICD \
-                                -Dsonar.sources=. \
-                                -Dsonar.exclusions=node_modules/** \
-                                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                                -Dsonar.host.url=${SONARQUBE_URL} \
-                                -Dsonar.login=${SONARQUBE_TOKEN}
-                            '''
-                        }
+                    sh 'ls -l coverage'  // Debugging step to verify coverage report presence
+                    withSonarQubeEnv('SonarQube') {
+                        sh '''
+                            if ! command -v sonar-scanner &> /dev/null
+                            then
+                                echo "sonar-scanner not found!"
+                                exit 1
+                            fi
+                            sonar-scanner \
+                            -Dsonar.projectKey=DevOps_Avenger_CICD \
+                            -Dsonar.sources=. \
+                            -Dsonar.exclusions=node_modules/** \
+                            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+                            -Dsonar.host.url=${SONARQUBE_URL} \
+                            -Dsonar.login=${SONARQUBE_TOKEN}
+                        '''
                     }
                 }
             }
