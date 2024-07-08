@@ -8,7 +8,7 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
         TRIVY_VERSION = '0.53.0'
         DOCKER_REPO = 'syahridan/devops-avengers-cicd-app'
-        JMETER_HOME = '/var/lib/jenkins/workspace/DevOps-Avengers_CICD (rnd)/jmeter'
+        JMETER_HOME = '/var/lib/jenkins/workspace/DevOps-Avengers_CICD_RND/jmeter'
         PATH = "${JMETER_HOME}/bin:${env.PATH}"
     }
 
@@ -76,7 +76,7 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 script {
-                    dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD (rnd)') {
+                    dir('/var/lib/jenkins/workspace/DevOps-Avengers_CICD_RND') {
                         sh 'docker-compose up -d'
                         sh 'docker-compose ps'
                         sh 'docker-compose logs'
