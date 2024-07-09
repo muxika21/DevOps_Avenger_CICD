@@ -1,17 +1,21 @@
 version: '3'
+
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${DOCKER_REPO}:latest
     ports:
       - "3000:3000"
     volumes:
-      - .:/app  
+      - .:/app  # Bind mount for local development; consider removing for production
     environment:
-      NODE_ENV: development
+      NODE_ENV: ${NODE_ENV}
       DB_HOST: db
-      DB_USER: root
-      DB_PASSWORD: example
-      DB_NAME: shopping_cart
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     depends_on:
       - db
 
@@ -19,8 +23,8 @@ services:
     image: mysql:5.7
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: example
-      MYSQL_DATABASE: shopping_cart
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     volumes:
       - db_data:/var/lib/mysql
 
