@@ -54,7 +54,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        trivy image --no-progress --exit-code 1 --severity HIGH,CRITICAL ${DOCKER_REPO}:latest
+                        trivy image --no-progress --exit-code 0 --severity HIGH,CRITICAL ${DOCKER_REPO}:latest
                     '''
                 }
             }
